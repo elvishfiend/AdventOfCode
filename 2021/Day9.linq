@@ -7,7 +7,7 @@ var heightMap = rawInput
 		line.ToCharArray()
 			.Select(x => int.Parse(x.ToString()))
 			.ToArray())
-	.ToArray();//.Dump();
+	.ToArray();
 
 var minima = 
 	from x in Enumerable.Range(0, 100)
@@ -27,31 +27,31 @@ minima.Select(p => new { minima = p, size = GetSizeUsingFloodFill(heightMap, p.x
 // for each minima, do a flood fill algorithm to find size
 int GetSizeUsingFloodFill(int[][] heightMap, int x, int y)
 {
-	var nodesToCheck = new Queue<(int x, int y)>(GetNeighborAddresses(x, y));
-	
-	var validNodes = new HashSet<(int x, int y)>();
-	var checkedNodes = new HashSet<(int x, int y)>();
-	
-	validNodes.Add((x,y)); // initial position is a valid node
+	var nodesToCheck = new Queue<(int x, int y)>();
+	nodesToCheck.Enqueue((x,y));
+	var visitedNodes = new HashSet<(int x, int y)>();
+
+	var validNodes = 0;
 	
 	while (nodesToCheck.TryDequeue(out var point))
 	{
-		checkedNodes.Add(point);
+		if (!visitedNodes.Add(point)) // if already seen
+			continue;
 		
 		if (heightMap[point.x][point.y] == 9)
 			continue;
 			
-		validNodes.Add(point);
-		
+		validNodes++;
+
 		foreach (var newNode in GetNeighborAddresses(point.x, point.y))
 		{
-			if (checkedNodes.Contains(newNode))
+			if (visitedNodes.Contains(newNode))
 				continue;
 			nodesToCheck.Enqueue(newNode);
 		}
 	}
 	
-	return validNodes.Count;
+	return validNodes;
 }
 
 IEnumerable<(int x, int y)> GetNeighborAddresses(int i, int j)
